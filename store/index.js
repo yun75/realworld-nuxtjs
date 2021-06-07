@@ -12,6 +12,9 @@ export const state = () => {
 export const mutations = {
   setUser (state, data) {
     state.user = data
+  },
+  deleteUser (state) {
+    state.user = null
   }
 }
 
@@ -19,7 +22,7 @@ export const actions = {
   // 这个特殊的 action 只会在服务端渲染期间自动调用
   // 作用：初始化容器数据，传递数据给客户端使用
   nuxtServerInit ({ commit }, { req }) {
-    console.log('nuxtServerInit')
+    // console.log('nuxtServerInit')
     let user = null
     // 如果请求头中有 Cookie
     if (req.headers.cookie) {

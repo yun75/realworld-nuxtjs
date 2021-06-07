@@ -1,10 +1,9 @@
 import { request } from '@/plugins/request'
 
 // 获取文章标签列表
-export const getTags = params => {
+export const getTags = () => {
   return request({
     method: 'GET',
-    url: '/api/tags',
-    params
+    url: '/api/tags'
   })
 }

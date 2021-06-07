@@ -3,7 +3,7 @@
 
     <div class="banner">
       <div class="container">
-        <h1 class="logo-font">拉钩教育</h1>
+        <h1 class="logo-font">conduit</h1>
         <p>A place to share your knowledge.</p>
       </div>
     </div>
@@ -62,56 +62,14 @@
               </li>
             </ul>
           </div>
-
+          <div class="article-preview" v-if="articles.length==0" >No articles are here... yet.</div>
           <div 
+            v-else
             class="article-preview"
             v-for="article in articles"
             :key="article.slug"
           >
-            <div class="article-meta">
-              <nuxt-link to="{
-                name: 'profile',
-                params: {
-                  username: article.author.username
-                }
-              }">
-                <img :src="article.author.image" />
-              </nuxt-link>
-              <div class="info">
-                <nuxt-link class="author" to="{
-                  name: 'profile',
-                  params: {
-                    username: article.author.username
-                  }
-                }">
-                  {{ article.author.username }}
-                </nuxt-link>
-                <span class="date">{{ article.createdAt | date('MMM DD, YYYY') }}</span>
-              </div>
-              <button 
-                class="btn btn-outline-primary btn-sm pull-xs-right"
-                :class="{
-                  active: article.favorited
-                }"
-                @click="onFavorite(article)"
-                :disabled="article.favoriteDisabled"
-              >
-                <i class="ion-heart"></i> {{ article.favoritesCount }}
-              </button>
-            </div>
-            <nuxt-link 
-              class="preview-link"
-              :to="{
-                name: 'article',
-                params: {
-                  slug: article.slug
-                }
-              }"
-            >
-              <h1>{{ article.title }}</h1>
-              <p>{{ article.description }}</p>
-              <span>Read more...</span>
-            </nuxt-link>
+            <article-item :article="article" />
           </div>
           <!-- 分页列表 start -->
           <nav>
@@ -173,12 +131,12 @@
 import { mapState } from 'vuex'
 import { 
   getArticles, 
-  getFeedArticles,
-  addFavorite,
-  deleteFavorite
+  getFeedArticles
 } from '@/api/article'
 import { getTags } from '@/api/tag'
+import articleItem from '@/components/article-item'
 export default {
+  components: { articleItem },
   name: 'HomeIndex',
   async asyncData ({ query, store }) {
     const page = Number.parseInt(query.page || 1) 
@@ -196,7 +154,10 @@ export default {
     ])
     const { articles, articlesCount } = articleRes.data
     const { tags } = tagRes.data
-    articles.forEach( article => article.favoriteDisabled = false)
+    articles.forEach( article => {
+      article.favoriteDisabled = false
+      article.followDisabled = false
+    })
     return {
       articles,
       articlesCount,
@@ -212,25 +173,6 @@ export default {
     ...mapState(['user']),
     totalPage () {
       return Math.ceil(this.articlesCount / this.limit)
-    }
-  },
-  methods: {
-    async onFavorite (article) {
-      console.log(article)
-      article.favoriteDisabled = true
-      if(article.favorited){
-        // 取消点赞
-        await deleteFavorite(article.slug)
-         article.favorited = false
-         article.favoritesCount += -1
-         
-      } else {
-        // 点赞
-        await addFavorite(article.slug)
-        article.favorited = true
-        article.favoritesCount += 1
-      }
-      article.favoriteDisabled = false
     }
   }
 }

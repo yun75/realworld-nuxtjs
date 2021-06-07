@@ -17,7 +17,7 @@ module.exports = {
             {
               path: '', // 默认子路由
               name: 'home',
-              component: resolve(__dirname, 'pages/home/')
+              component: resolve(__dirname, 'pages/home/'),
             },
             {
               path: '/login',
@@ -40,7 +40,7 @@ module.exports = {
               component: resolve(__dirname, 'pages/settings/')
             },
             {
-              path: '/editor',
+              path: '/editor/:slug?',
               name: 'editor',
               component: resolve(__dirname, 'pages/editor/')
             },

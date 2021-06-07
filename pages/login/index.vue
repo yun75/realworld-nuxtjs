@@ -61,8 +61,8 @@ export default {
     return {
       user: {
         username: '',
-        email: '',
-        password: ''
+        email: '2532267434@qq.com',
+        password: 'wcy123456'
       },
       //错误信息 
       // errors: {
@@ -83,7 +83,7 @@ export default {
         : await register({
             user: this.user
           })
-      console.log(data)
+      // console.log(data)
       // 保存用户的登录状态
       // 存储到容器，方便共享
       this.$store.commit('setUser', data.user)

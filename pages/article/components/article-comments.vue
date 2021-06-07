@@ -1,11 +1,11 @@
 <template>
   <div>
-    <form class="card comment-form">
+    <form @submit.prevent="onSubmit" class="card comment-form">
       <div class="card-block">
-        <textarea class="form-control" placeholder="Write a comment..." rows="3"></textarea>
+        <textarea v-model="comment.body" class="form-control" placeholder="Write a comment..." rows="3" required></textarea>
       </div>
       <div class="card-footer">
-        <img src="http://i.imgur.com/Qr71crq.jpg" class="comment-author-img" />
+        <img :src="user.image" class="comment-author-img" />
         <button class="btn btn-sm btn-primary">
         Post Comment
         </button>
@@ -42,9 +42,9 @@
           }"
         >{{ comment.author.username }}</nuxt-link>
         <span class="date-posted">{{ comment.createAt | date('MMM DD, YYYY') }}</span>
-        <span class="mod-options">
-          <i class="ion-edit"></i>
-          <i class="ion-trash-a"></i>
+        <span class="mod-options" v-if="comment.author.username === user.username">
+          <!-- <i class="ion-edit"></i> -->
+          <i @click="onDelete(comment.id)" class="ion-trash-a"></i>
         </span>
       </div>
     </div>
@@ -52,7 +52,8 @@
 </template>
 
 <script>
-import { getComments } from '@/api/article'
+import { getComments, addComment, deleteComment } from '@/api/article'
+import { mapState } from 'vuex'
 export default {
   name: 'ArticleComments',
   props: {
@@ -63,12 +64,42 @@ export default {
   },
   data () {
     return {
-      comments: [] // 评论列表
+      comments: [], // 评论列表
+      comment: {
+        body: ''
+      }
     }
+  },
+  computed: {
+    ...mapState(['user'])
   },
   async mounted () {
     const { data } = await getComments(this.article.slug)
     this.comments = data.comments
+  },
+  methods: {
+    async onSubmit () {
+      try {
+        // 提交评论
+        const { data } = await addComment(this.article.slug, { comment: this.comment }) 
+        this.comments.unshift(data.comment)
+        this.comment.body = ''
+      } catch (err) {
+        //  console.log(error)
+        this.errors = err.response.data.errors
+      }
+    },
+    async onDelete (id) {
+      try {
+        // 删除评论
+        await deleteComment(this.article.slug, id)
+        const _index = this.comments.findIndex(comment => comment.id === id)
+        this.comments.splice(_index, 1)
+      } catch (err) {
+        //  console.log(error)
+        this.errors = err.response.data.errors
+      }
+    }
   }
 }
 </script>

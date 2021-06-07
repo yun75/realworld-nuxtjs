@@ -4,7 +4,7 @@
     <div class="banner">
       <div class="container">
 
-        <h1>How to build webapps that scale</h1>
+        <h1>{{ article.title }}</h1>
         <ArticleMeta :article="article" />
       </div>
     </div>
@@ -12,7 +12,22 @@
     <div class="container page">
 
       <div class="row article-content">
-        <div class="col-md-12" v-html="article.body"></div>
+        <div class="col-md-12">
+
+          <div v-html="article.body"></div>
+
+          <!-- tag 标签 start -->
+          <ul class="tag-list" v-if="article.tagList">
+            <li 
+              v-for="tag in article.tagList" 
+              :key="tag"
+              class="tag-default tag-pill tag-outline"
+            >
+              {{ tag }}
+            </li>
+          </ul>
+          <!-- tag 标签 end -->
+        </div>
       </div>
 
       <hr />
@@ -24,7 +39,15 @@
       <div class="row">
 
         <div class="col-xs-12 col-md-8 offset-md-2">
-          <ArticleComments :article="article" />
+          
+          <ArticleComments v-if="user" :article="article" />
+          <div v-else>
+            <nuxt-link to="/login">Sign in</nuxt-link>
+             or 
+            <nuxt-link to="/register">Sign up</nuxt-link>
+            to add comments on this article.
+          </div>
+
         </div>
 
       </div>
@@ -32,7 +55,7 @@
     </div>
 
   </div>
-
+              
 </template>
 
 <script>
@@ -40,6 +63,7 @@ import { getArticle } from '@/api/article'
 import MarkdownIt from 'markdown-it'
 import ArticleMeta from './components/article-meta'
 import ArticleComments from './components/article-comments'
+import { mapState } from 'vuex'
 export default {
   name: 'ArticleIndex',
   async asyncData ({ params }) {
@@ -50,6 +74,9 @@ export default {
     return {
       article: data.article
     }
+  },
+  computed: {
+    ...mapState(['user']),
   },
   components: {
     ArticleMeta,
